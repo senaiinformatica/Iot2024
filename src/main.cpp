@@ -10,6 +10,7 @@ void setup()
   setup_wifi();
   setup_time();
   inicializa_entradas();
+  inicializa_saidas();
 }
 
 
@@ -17,4 +18,5 @@ void loop()
 {
   atualiza_time();
   botoes();
+  atualiza_saidas();
 }
