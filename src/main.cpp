@@ -16,6 +16,5 @@ void setup()
 void loop()
 {
   atualiza_time();
-  hora_certa();
-  timeStamp();
+  botoes();
 }

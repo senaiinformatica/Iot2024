@@ -10,3 +10,22 @@ void inicializa_entradas()
 {
     botao_boot.attach(BOTAO_BOOT_PIN, INPUT_PULLUP);
 }
+
+void botoes()
+{
+    //atualiza do estado do botao_boot
+    botao_boot.update();
+
+    //verifica se o botao_boot foi pressionado
+    if(botao_boot.fell())
+    {
+        Serial.println("botao pressionado");
+    }
+
+    //verifica se o botao_boot foi solto
+    else if (botao_boot.rose())
+    {
+        Serial.println("botao solto");
+    }
+    
+}
