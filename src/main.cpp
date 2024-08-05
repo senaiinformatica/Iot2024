@@ -17,6 +17,7 @@ void setup()
 void loop()
 {
   atualiza_time();
-  botoes();
   atualiza_saidas();
+
+ 
 }
