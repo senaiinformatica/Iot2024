@@ -1,12 +1,13 @@
-#pragma onde
+#pragma once
 
-const int fusoHorario = -10800;
-const unsigned long atualizaNTP = 60000; // em milissegundos
 
 //Retorna a hora atual no formato hh:mm:ss
 void hora_certa();
 
-//Retorna tempo no formato POSIX(unsigned long)
+/*
+@brief Retorna tempo no formato POSIX
+@return unsigned long
+*/
 unsigned long timeStamp();
 
 //Configura o servidor NTP

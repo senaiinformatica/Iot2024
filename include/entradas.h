@@ -1,0 +1,1 @@
+void inicializa_entradas();

@@ -3,6 +3,9 @@
 #include <TimeLib.h>   // Formatar a hora
 #include "tempo.h"
 
+const int fusoHorario = -10800;
+const unsigned long atualizaNTP = 60000; // em milissegundos
+
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", fusoHorario, atualizaNTP);
 
