@@ -23,4 +23,6 @@ void loop()
   atualiza_mqtt();
   if (botao_boot_pressionado()) 
   LedBuiltInState = !LedBuiltInState;
+
+  
 }

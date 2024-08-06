@@ -5,9 +5,10 @@
 #include "senhas.h"
 #include "saidas.h"
 
-#define mqtt_topic1 "projeto1/led"
-//! ALTERAR O ID DO CLIENTE PARA UM VALOR ÚNICO
-#define cliente_id "ESP32Client1345648"
+#define mqtt_topic1 "projetoProfessor/led1"
+#define mqtt_topic2 "projetoProfessor/led2"
+
+const String cliente_id = "ESP32Client" + String(random(0xffff), HEX);
 
 //Definição dos dados de conexão
 WiFiClient espClient;
@@ -71,10 +72,11 @@ void reconecta_mqtt()
   {
     Serial.print("Tentando se conectar ao Broker MQTT: ");
     Serial.println(mqtt_server);
-    if (client.connect(cliente_id))
+    if (client.connect(cliente_id.c_str()))
     {
       Serial.println("Conectado ao Broker MQTT");
       client.subscribe(mqtt_topic1);
+      client.subscribe(mqtt_topic2);
     }
     else
     {
@@ -85,6 +87,12 @@ void reconecta_mqtt()
   }
 }
 
+void publica_mqtt(String topico, String msg)
+{
+  client.publish(topico.c_str(), msg.c_str());
+}
+
+//! NAO ESQUECER DE SE INCREVER NO TOPICO LINHA 78
 void tratar_msg(char *topic, String msg)
 {
 if(strcmp(topic, mqtt_topic1) == 0)
@@ -106,10 +114,31 @@ if(strcmp(topic, mqtt_topic1) == 0)
       Serial.println("Comando desconhecido");
     }
   }
+
+  else if(strcmp(topic, mqtt_topic2) == 0)
+  {
+    if(msg == "liga")
+    {
+      LedExternoState = true;
+    }
+    else if(msg == "desliga")
+    {
+      LedExternoState = false;
+    }
+    else if(msg == "alterna")
+    {
+      LedExternoState = !LedExternoState;
+    }
+    else
+    {
+      Serial.println("Comando desconhecido");
+    }
+  }
+  else
+  {
+    Serial.println("Topico desconhecido");
+  }
 }
 
-void publica_mqtt(String topico, String msg)
-{
-  client.publish(topico.c_str(), msg.c_str());
-}
+
 
