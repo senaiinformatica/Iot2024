@@ -5,8 +5,9 @@
 #include "senhas.h"
 #include "saidas.h"
 
-#define mqtt_topic1 "led"
-#define cliente_id "ESP32Client"
+#define mqtt_topic1 "projeto1/led"
+//! ALTERAR O ID DO CLIENTE PARA UM VALOR ÚNICO
+#define cliente_id "ESP32Client1345648"
 
 //Definição dos dados de conexão
 WiFiClient espClient;
@@ -88,13 +89,21 @@ void tratar_msg(char *topic, String msg)
 {
 if(strcmp(topic, mqtt_topic1) == 0)
   {
-    if(msg == "ligar")
+    if(msg == "liga")
+    {
+      LedBuiltInState = true;
+    }
+    else if(msg == "desliga")
+    {
+      LedBuiltInState = false;
+    }
+    else if(msg == "alterna")
     {
       LedBuiltInState = !LedBuiltInState;
     }
     else
     {
-      
+      Serial.println("Comando desconhecido");
     }
   }
 }
