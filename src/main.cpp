@@ -11,6 +11,7 @@ void setup()
   setup_time();
   inicializa_entradas();
   inicializa_saidas();
+  inicializa_mqtt();
 }
 
 
@@ -18,6 +19,8 @@ void loop()
 {
   atualiza_time();
   atualiza_saidas();
-
- 
+  atualiza_botoes();
+  atualiza_mqtt();
+  if (botao_boot_pressionado()) 
+  LedBuiltInState = !LedBuiltInState;
 }
