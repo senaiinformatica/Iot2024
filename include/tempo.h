@@ -6,7 +6,7 @@ void hora_certa();
 
 /*
 @brief Retorna tempo no formato POSIX
-@return unsigned long
+@return tempo no formato POSIX
 */
 unsigned long timeStamp();
 

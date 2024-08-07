@@ -1,5 +1,8 @@
+
+//Inicia as entradas digitais
 void inicializa_entradas();
 
+//Atualiza o estado do botão
 void atualiza_botoes();
 
 /*
