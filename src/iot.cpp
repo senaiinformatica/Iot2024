@@ -17,6 +17,7 @@ PubSubClient client(espClient);
 void tratar_msg(char *topic, String msg);
 void callback(char *topic, byte *payload, unsigned int length);
 void reconecta_mqtt();
+void inscricao_topicos();
 
 //Inicia a conexão WiFi
 void setup_wifi()
