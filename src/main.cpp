@@ -11,7 +11,7 @@
  * com conexão WiFi e MQTT.
  * 
  * versão: 0.9
- */
+ *************************/
 
 
 #include <Arduino.h>
@@ -21,11 +21,12 @@
 #include "tempo.h"
 
 //Definição dos tópicos de publicação
-#define mqtt_topic1 "projetoProfessor/led1"
+#define mqtt_pub_topic1 "projetoProfessor/led1"
 
 
 //Protótipos das funções do main.cpp
 void acao_botao_boot();
+void acao_botao_externo();
 
 //Variáveis globais
 
@@ -47,6 +48,7 @@ void loop()
   atualiza_botoes();
   atualiza_mqtt();
   acao_botao_boot();
+  acao_botao_externo();
 }
 
 
@@ -56,5 +58,16 @@ void acao_botao_boot()
   if (botao_boot_pressionado())
   {
     LedBuiltInState = !LedBuiltInState;
+    if(LedBuiltInState) publica_mqtt(mqtt_pub_topic1, "LIGADO" );
+    else publica_mqtt(mqtt_pub_topic1, "DESLIGADO");
+  }
+}
+
+void acao_botao_externo()
+{
+  
+  if(botao_externo_pressionado())
+  {
+    LedExternoState = !LedExternoState;
   }
 }

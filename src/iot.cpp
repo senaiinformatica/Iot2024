@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <PubSubClient.h> // Baixar a biblioteca PubSubClient
+#include <PubSubClient.h> 
 #include "iot.h"
 #include "senhas.h"
 #include "saidas.h"
@@ -111,6 +111,7 @@ void inscricao_topicos()
 // Trata as mensagens recebidas
 void tratar_msg(char *topic, String msg)
 {
+  // Tratamento do tópico 1
   if (strcmp(topic, mqtt_topic1) == 0)
   {
     if (msg == "liga")
@@ -130,7 +131,7 @@ void tratar_msg(char *topic, String msg)
       Serial.println("Comando desconhecido");
     }
   }
-
+   // Tratamento do tópico 2
   else if (strcmp(topic, mqtt_topic2) == 0)
   {
     if (msg == "liga")
@@ -150,8 +151,5 @@ void tratar_msg(char *topic, String msg)
       Serial.println("Comando desconhecido");
     }
   }
-  else
-  {
-    Serial.println("Topico desconhecido");
-  }
+
 }

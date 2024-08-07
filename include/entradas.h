@@ -10,3 +10,9 @@ void atualiza_botoes();
 @return Verdadeiro caso for pressionado
 */
 bool botao_boot_pressionado();
+
+/*
+@brief Indica se o botão externo foi pressionado
+@return Verdadeiro caso for pressionado
+*/
+bool botao_externo_pressionado();
