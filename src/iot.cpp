@@ -75,8 +75,7 @@ void reconecta_mqtt()
     if (client.connect(cliente_id.c_str()))
     {
       Serial.println("Conectado ao Broker MQTT");
-      client.subscribe(mqtt_topic1);
-      client.subscribe(mqtt_topic2);
+      inscricao_topicos();
     }
     else
     {
@@ -92,7 +91,15 @@ void publica_mqtt(String topico, String msg)
   client.publish(topico.c_str(), msg.c_str());
 }
 
-//! NAO ESQUECER DE SE INCREVER NO TOPICO LINHA 78
+
+void inscricao_topicos()
+{
+  client.subscribe(mqtt_topic1);
+  client.subscribe(mqtt_topic2);
+}
+
+
+
 void tratar_msg(char *topic, String msg)
 {
 if(strcmp(topic, mqtt_topic1) == 0)
