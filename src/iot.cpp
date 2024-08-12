@@ -4,10 +4,13 @@
 #include "iot.h"
 #include "senhas.h"
 #include "saidas.h"
+#include "atuadores.h"
 
 // Definição dos tópicos de inscrição
 #define mqtt_topic1 "projetoProfessor/led1"
 #define mqtt_topic2 "projetoProfessor/led2"
+#define mqtt_topic3 "projetoProfessor/servo"
+
 
 // Definição do ID do cliente MQTT randomico
 const String cliente_id = "ESP32Client" + String(random(0xffff), HEX);
@@ -104,8 +107,9 @@ void publica_mqtt(String topico, String msg)
 // Inscreve nos tópicos MQTT
 void inscricao_topicos()
 {
-  client.subscribe(mqtt_topic1);
-  client.subscribe(mqtt_topic2);
+  client.subscribe(mqtt_topic1); //LED 1
+  client.subscribe(mqtt_topic2); //LED 2
+  client.subscribe(mqtt_topic3); //Servo
 }
 
 // Trata as mensagens recebidas
@@ -114,42 +118,17 @@ void tratar_msg(char *topic, String msg)
   // Tratamento do tópico 1
   if (strcmp(topic, mqtt_topic1) == 0)
   {
-    if (msg == "liga")
-    {
-      LedBuiltInState = true;
-    }
-    else if (msg == "desliga")
-    {
-      LedBuiltInState = false;
-    }
-    else if (msg == "alterna")
-    {
-      LedBuiltInState = !LedBuiltInState;
-    }
-    else
-    {
-      Serial.println("Comando desconhecido");
-    }
+    
   }
-   // Tratamento do tópico 2
-  else if (strcmp(topic, mqtt_topic2) == 0)
+
+  else   if (strcmp(topic, mqtt_topic2) == 0)
   {
-    if (msg == "liga")
-    {
-      LedExternoState = true;
-    }
-    else if (msg == "desliga")
-    {
-      LedExternoState = false;
-    }
-    else if (msg == "alterna")
-    {
-      LedExternoState = !LedExternoState;
-    }
-    else
-    {
-      Serial.println("Comando desconhecido");
-    }
+    
+  }
+
+   else if (strcmp(topic, mqtt_topic3) == 0)
+  {
+    posiciona_servo(msg.toInt());
   }
 
 }

@@ -15,30 +15,37 @@
 
 
 #include <Arduino.h>
+#include <DHTesp.h>
 #include "iot.h"
 #include "saidas.h"
 #include "entradas.h"
 #include "tempo.h"
+#include "atuadores.h"
 
 //Definição dos tópicos de publicação
-#define mqtt_pub_topic1 "projetoProfessor/led1"
+#define mqtt_pub_topic1 "projetoProfessor/DHT/Temperatura"
+#define mqtt_pub_topic2 "projetoProfessor/DHT/Umidade"
+#define DHTPIN 2
+
+//Criacao de objetos
+DHTesp dht; //Objeto do sensor DHT22
 
 
-//Protótipos das funções do main.cpp
-void acao_botao_boot();
-void acao_botao_externo();
 
 //Variáveis globais
 
 
 void setup()
 {
+  dht.setup(DHTPIN, DHTesp::DHT22);
+
   Serial.begin(115200);
   setup_wifi();
   setup_time();
   inicializa_entradas();
   inicializa_saidas();
   inicializa_mqtt();
+  inicializa_servos();
 }
 
 void loop()
@@ -47,27 +54,12 @@ void loop()
   atualiza_saidas();
   atualiza_botoes();
   atualiza_mqtt();
-  acao_botao_boot();
-  acao_botao_externo();
-}
+
+  float umidade = dht.getHumidity();
+  float temperatura = dht.getTemperature();
+
+  publica_mqtt(mqtt_pub_topic1, String(temperatura));
+  publica_mqtt(mqtt_pub_topic2, String(umidade));
+} 
 
 
-//Função que verifica se o botão foi pressionado e sua ação
-void acao_botao_boot()
-{
-  if (botao_boot_pressionado())
-  {
-    LedBuiltInState = !LedBuiltInState;
-    if(LedBuiltInState) publica_mqtt(mqtt_pub_topic1, "LIGADO" );
-    else publica_mqtt(mqtt_pub_topic1, "DESLIGADO");
-  }
-}
-
-void acao_botao_externo()
-{
-  
-  if(botao_externo_pressionado())
-  {
-    LedExternoState = !LedExternoState;
-  }
-}
