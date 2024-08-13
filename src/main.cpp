@@ -1,39 +1,38 @@
 /*************************
- * Projeto IOT com ESP32 
+ * Projeto IOT com ESP32
  * Escola SENAI de Informática
- * Curso de Apredizagem industrial 
+ * Curso de Apredizagem industrial
  * Integrador de soluções em nuvem
  * Data: 01/08/2024
- * 
+ *
  * Autor: Thiago Augusto de Oliveira
- * 
+ *
  * Descrição: Projeto de automação utilizando ESP32
  * com conexão WiFi e MQTT.
- * 
+ *
  * versão: 0.9
  *************************/
 
-
 #include <Arduino.h>
 #include <DHTesp.h>
+#include <ArduinoJson.h>
 #include "iot.h"
 #include "saidas.h"
 #include "entradas.h"
 #include "tempo.h"
 #include "atuadores.h"
 
-//Definição dos tópicos de publicação
-#define mqtt_pub_topic1 "projetoProfessor/DHT/Temperatura"
-#define mqtt_pub_topic2 "projetoProfessor/DHT/Umidade"
+// Definição dos tópicos de publicação
+#define mqtt_pub_topic1 "projetoProfessor/DHT"
+#define mqtt_pub_topic2 ""
 #define DHTPIN 2
 
-//Criacao de objetos
-DHTesp dht; //Objeto do sensor DHT22
+// Criacao de objetos
+DHTesp dht; // Objeto do sensor DHT22
 
-
-
-//Variáveis globais
-
+// Variáveis globais
+unsigned long tempo_anterior = 0;
+const unsigned long intervalo = 1000;
 
 void setup()
 {
@@ -55,11 +54,19 @@ void loop()
   atualiza_botoes();
   atualiza_mqtt();
 
-  float umidade = dht.getHumidity();
-  float temperatura = dht.getTemperature();
+  if (millis() - tempo_anterior >= intervalo)
+  {
+    tempo_anterior = millis();
+    float umidade = dht.getHumidity();
+    float temperatura = dht.getTemperature();
 
-  publica_mqtt(mqtt_pub_topic1, String(temperatura));
-  publica_mqtt(mqtt_pub_topic2, String(umidade));
-} 
+    String json;	
+    
+    JsonDocument doc;
+    doc["umidade"] = umidade;
+    doc["temperatura"] = temperatura;
 
-
+    serializeJson(doc, json);
+    publica_mqtt(mqtt_pub_topic1, json); 
+  }
+}

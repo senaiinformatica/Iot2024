@@ -1,13 +1,14 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <PubSubClient.h> 
+#include <PubSubClient.h>
+#include <ArduinoJson.h> 
 #include "iot.h"
 #include "senhas.h"
 #include "saidas.h"
 #include "atuadores.h"
 
 // Definição dos tópicos de inscrição
-#define mqtt_topic1 "projetoProfessor/led1"
+#define mqtt_topic1 "projetoProfessor/DHT"
 #define mqtt_topic2 "projetoProfessor/led2"
 #define mqtt_topic3 "projetoProfessor/servo"
 
@@ -115,10 +116,21 @@ void inscricao_topicos()
 // Trata as mensagens recebidas
 void tratar_msg(char *topic, String msg)
 {
+  JsonDocument doc;
+  
   // Tratamento do tópico 1
   if (strcmp(topic, mqtt_topic1) == 0)
   {
-    
+    deserializeJson(doc, msg);
+    float umidade = doc["umidade"];
+    float temperatura = doc["temperatura"];
+
+    Serial.print("Umidade: ");
+    Serial.print(umidade);
+    Serial.print(" %\t");
+    Serial.print("Temperatura: ");
+    Serial.print(temperatura);
+    Serial.println(" *C"); 
   }
 
   else   if (strcmp(topic, mqtt_topic2) == 0)
