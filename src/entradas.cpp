@@ -11,11 +11,13 @@
 Bounce botao_boot = Bounce();
 Bounce botaoExterno = Bounce();
 
+
 //Inicializa as entradas digitais
 void inicializa_entradas()
 {
     botao_boot.attach(BOTAO_BOOT_PIN, INPUT_PULLUP);
     botaoExterno.attach(BOTAO_EXTERNO_PIN, INPUT_PULLUP);
+
 }
 
 //Atualiza o estado dos botões

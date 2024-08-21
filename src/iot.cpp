@@ -116,68 +116,8 @@ void inscricao_topicos()
 // Trata as mensagens recebidas
 void tratar_msg(char *topic, String msg)
 {
-  JsonDocument doc;
-
-  //{"temperature":27.12,"pressure":93207.68,"altitude":753.96,"humidity":26,"CO2":0.82,"timestamp":1724077225}
-
-  // Tratamento do tópico 1
   if (strcmp(topic, mqtt_topic1) == 0)
   {
-    deserializeJson(doc, msg);
 
-    float var_temperatura;
-    float var_pressao;
-    float var_altitude;
-    int var_umidade;
-    float var_co2;
-    unsigned long var_timestamp;
-
-    if (doc.containsKey("temperature"))
-    {
-      var_temperatura = doc["temperature"];
-    }
-
-    if (doc.containsKey("pressure"))
-    {
-      var_pressao = doc["pressure"];
-    }
-
-    if (doc.containsKey("altitude"))
-    {
-      var_altitude = doc["altitude"];
-    }
-
-    if (doc.containsKey("humidity"))
-    {
-      var_umidade = doc["humidity"];
-    }
-
-    if (doc.containsKey("CO2"))
-    {
-      var_co2 = doc["CO2"];
-    }
-
-    if (doc.containsKey("timestamp"))
-    {
-      var_timestamp = doc["timestamp"];
-    }
-
-    Serial.println("Temperatura: " + String(var_temperatura));
-    Serial.println("Pressão: " + String(var_pressao));
-    Serial.println("Altitude: " + String(var_altitude));
-    Serial.println("Umidade: " + String(var_umidade));
-    Serial.println("CO2: " + String(var_co2));
-    setTime(var_timestamp);
-    Serial.printf("%02d/%02d/%04d", day(), month(), year());
-    Serial.printf(" %02d:%02d:%02d \n", hour(), minute(), second());
-  }
-
-  else if (strcmp(topic, mqtt_topic2) == 0)
-  {
-  }
-
-  else if (strcmp(topic, mqtt_topic3) == 0)
-  {
-    posiciona_servo(msg.toInt());
   }
 }

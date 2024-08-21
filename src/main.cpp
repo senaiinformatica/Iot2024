@@ -56,17 +56,16 @@ void loop()
 
   if (millis() - tempo_anterior >= intervalo)
   {
-    tempo_anterior = millis();
-    float umidade = dht.getHumidity();
-    float temperatura = dht.getTemperature();
 
-    String json;	
-    
-    JsonDocument doc;
-    doc["umidade"] = umidade;
-    doc["temperatura"] = temperatura;
 
-    serializeJson(doc, json);
-    publica_mqtt(mqtt_pub_topic1, json); 
   }
 }
+
+
+    // String json;	
+    // JsonDocument doc;
+    //doc["umidade"] = umidade;
+    //doc["temperatura"] = temperatura;
+
+    // serializeJson(doc, json);
+    // publica_mqtt(mqtt_pub_topic1, json); 
