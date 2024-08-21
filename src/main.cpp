@@ -14,7 +14,6 @@
  *************************/
 
 #include <Arduino.h>
-#include <DHTesp.h>
 #include <ArduinoJson.h>
 #include "iot.h"
 #include "saidas.h"
@@ -23,21 +22,18 @@
 #include "atuadores.h"
 
 // Definição dos tópicos de publicação
-#define mqtt_pub_topic1 "projetoProfessor/DHT"
-#define mqtt_pub_topic2 ""
-#define DHTPIN 2
+#define mqtt_pub_topic1 "projetoProfessor/desafio1"
 
 // Criacao de objetos
-DHTesp dht; // Objeto do sensor DHT22
 
 // Variáveis globais
 unsigned long tempo_anterior = 0;
-const unsigned long intervalo = 1000;
+const unsigned long intervalo = 5000;
+
+// Prototipo das funcoes
 
 void setup()
 {
-  dht.setup(DHTPIN, DHTesp::DHT22);
-
   Serial.begin(115200);
   setup_wifi();
   setup_time();
@@ -54,18 +50,37 @@ void loop()
   atualiza_botoes();
   atualiza_mqtt();
 
+  JsonDocument doc;
+  String json;
+  bool mensagemEmFila = false;
+
   if (millis() - tempo_anterior >= intervalo)
   {
+    tempo_anterior = millis();
+    doc["timeStamp"] = timeStamp();
+    mensagemEmFila = true;
+  }
 
+  if (botao_boot_pressionado())
+  {
+    LedBuiltInState = !LedBuiltInState;
+    doc["LedState"] = LedBuiltInState;
+    doc["BotaoState"] = true;
+    doc["timeStamp"] = timeStamp();
+    mensagemEmFila = true;
+  }
 
+  else if (botao_boot_solto())
+  {
+    doc["BotaoState"] = false;
+    doc["timeStamp"] = timeStamp();
+    mensagemEmFila = true;
+  }
+
+  if (mensagemEmFila)
+  {
+    serializeJson(doc, json);
+    publica_mqtt(mqtt_pub_topic1, json);
+    mensagemEmFila = false;
   }
 }
-
-
-    // String json;	
-    // JsonDocument doc;
-    //doc["umidade"] = umidade;
-    //doc["temperatura"] = temperatura;
-
-    // serializeJson(doc, json);
-    // publica_mqtt(mqtt_pub_topic1, json); 

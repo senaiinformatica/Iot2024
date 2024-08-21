@@ -63,14 +63,15 @@ void atualiza_mqtt()
 // Função de callback chamada quando uma mensagem é recebida
 void callback(char *topic, byte *payload, unsigned int length)
 {
-  Serial.printf("Mensagem recebida [ %s ] \n\r", topic);
   String msg = "";
   for (int i = 0; i < length; i++)
   {
-    Serial.print((char)payload[i]);
     msg += (char)payload[i];
   }
-  Serial.println();
+  
+  //Serial.printf("Mensagem recebida em [ %s ] \n\r", topic);
+  //Serial.printf(msg);
+
   tratar_msg(topic, msg);
 }
 
@@ -108,7 +109,7 @@ void publica_mqtt(String topico, String msg)
 // Inscreve nos tópicos MQTT
 void inscricao_topicos()
 {
-  client.subscribe(mqtt_topic1); // LED 1
+  // client.subscribe(mqtt_topic1); // LED 1
   // client.subscribe(mqtt_topic2); //LED 2
   // client.subscribe(mqtt_topic3); //Servo
 }

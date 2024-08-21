@@ -34,6 +34,12 @@ bool botao_boot_pressionado()
     return botao_boot.fell();
 }
 
+//Retorna se o botão boot foi solto
+bool botao_boot_solto()
+{
+    return botao_boot.rose();
+}
+
 //Retorna se o botão externo foi pressionado
 bool botao_externo_pressionado()
 {

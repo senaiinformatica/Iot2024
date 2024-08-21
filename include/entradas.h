@@ -11,6 +11,13 @@ void atualiza_botoes();
 */
 bool botao_boot_pressionado();
 
+
+/*
+@brief Indica se o botão boot foi solto
+@return Verdadeiro caso for solto
+*/
+bool botao_boot_solto();
+
 /*
 @brief Indica se o botão externo foi pressionado
 @return Verdadeiro caso for pressionado
