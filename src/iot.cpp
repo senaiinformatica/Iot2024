@@ -9,9 +9,9 @@
 #include "atuadores.h"
 
 // Definição dos tópicos de inscrição
-#define mqtt_topic1 "projeto_integrado/SENAI134/Cienciadedados/GrupoX"
-#define mqtt_topic2 "projetoProfessor/led2"
-#define mqtt_topic3 "projetoProfessor/servo"
+#define mqtt_topic1 "projetoProfessor/desafio1"
+#define mqtt_topic2 ""
+#define mqtt_topic3 ""
 
 // Definição do ID do cliente MQTT randomico
 const String cliente_id = "ESP32Client" + String(random(0xffff), HEX);
@@ -109,7 +109,7 @@ void publica_mqtt(String topico, String msg)
 // Inscreve nos tópicos MQTT
 void inscricao_topicos()
 {
-  // client.subscribe(mqtt_topic1); // LED 1
+   ++// LED 1
   // client.subscribe(mqtt_topic2); //LED 2
   // client.subscribe(mqtt_topic3); //Servo
 }
@@ -119,6 +119,11 @@ void tratar_msg(char *topic, String msg)
 {
   if (strcmp(topic, mqtt_topic1) == 0)
   {
-
+    JsonDocument doc;
+    deserializeJson(doc, msg);
+    if(doc.containsKey("LedState"))
+    {
+      LedBuiltInState = doc["LedState"];
+    }
   }
 }
