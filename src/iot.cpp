@@ -68,9 +68,9 @@ void callback(char *topic, byte *payload, unsigned int length)
   {
     msg += (char)payload[i];
   }
-  
-  //Serial.printf("Mensagem recebida em [ %s ] \n\r", topic);
-  //Serial.println(msg);
+
+  // Serial.printf("Mensagem recebida em [ %s ] \n\r", topic);
+  // Serial.println(msg);
 
   tratar_msg(topic, msg);
 }
@@ -109,7 +109,7 @@ void publica_mqtt(String topico, String msg)
 // Inscreve nos tópicos MQTT
 void inscricao_topicos()
 {
-   client.subscribe(mqtt_topic1); // LED 1
+  client.subscribe(mqtt_topic1); // LED 1
   // client.subscribe(mqtt_topic2); //LED 2
   // client.subscribe(mqtt_topic3); //Servo
 }
@@ -119,11 +119,19 @@ void tratar_msg(char *topic, String msg)
 {
   if (strcmp(topic, mqtt_topic1) == 0)
   {
+    int senha = 1234;
+
     JsonDocument doc;
     deserializeJson(doc, msg);
-    if(doc.containsKey("LedState"))
+    if (doc.containsKey("token"))
     {
-      LedBuiltInState = doc["LedState"];
+      if (doc["token"] == senha)
+      {
+        if (doc.containsKey("LedState"))
+        {
+          LedBuiltInState = doc["LedState"];
+        }
+      }
     }
   }
 }
