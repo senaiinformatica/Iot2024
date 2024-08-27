@@ -9,7 +9,6 @@
 #include "atuadores.h"
 #include "funcoes.h"
 
-
 // Definição dos tópicos de inscrição
 #define mqtt_topic1 "projetoProfessor/desafio1"
 #define mqtt_topic2 ""
@@ -116,6 +115,8 @@ void inscricao_topicos()
   // client.subscribe(mqtt_topic3); //Servo
 }
 
+String usuarioAutorizado = "!@#$%^&*()";
+
 // Trata as mensagens recebidas
 void tratar_msg(char *topic, String msg)
 {
@@ -129,12 +130,30 @@ void tratar_msg(char *topic, String msg)
     {
       if (doc["token"] == senha)
       {
-        tempoSenhaEstendido();
-        if (doc.containsKey("LedState"))
+        if (doc.containsKey("user"))
         {
-          LedBuiltInState = doc["LedState"];
+          String user = doc["user"].as<String>();
+
+          if (usuarioAutorizado == "!@#$%^&*()") // verificado se é a primeira conexão
+            usuarioAutorizado = user;
+
+          if (usuarioAutorizado == user)
+          {
+            tempoSenhaEstendido();
+
+            //! ********USUARIO AUTORIZADO APARTIR DAQUI********** */
+            if (doc.containsKey("LedState"))
+            {
+              LedBuiltInState = doc["LedState"];
+            }
+          }
         }
       }
     }
   }
+}
+
+void resetaUsuario()
+{
+  usuarioAutorizado = "!@#$%^&*()";
 }

@@ -99,6 +99,7 @@ int randomiza_senha()
 
   if (tempoAtual - tempoInicialResetSenha >= intervaloResetSenha)
   {
+    resetaUsuario();
     if (intervaloResetSenha != intervaloNormal)
       intervaloResetSenha = intervaloNormal;
     tempoInicialResetSenha = tempoAtual;
