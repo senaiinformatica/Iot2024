@@ -7,6 +7,8 @@
 #include "senhas.h"
 #include "saidas.h"
 #include "atuadores.h"
+#include "funcoes.h"
+
 
 // Definição dos tópicos de inscrição
 #define mqtt_topic1 "projetoProfessor/desafio1"
@@ -119,7 +121,7 @@ void tratar_msg(char *topic, String msg)
 {
   if (strcmp(topic, mqtt_topic1) == 0)
   {
-    int senha = 1234;
+    int senha = randomiza_senha();
 
     JsonDocument doc;
     deserializeJson(doc, msg);

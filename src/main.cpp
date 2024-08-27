@@ -20,6 +20,7 @@
 #include "entradas.h"
 #include "tempo.h"
 #include "atuadores.h"
+#include "funcoes.h"
 
 // Definição dos tópicos de publicação
 #define mqtt_pub_topic1 "projetoProfessor/desafio1"
@@ -28,7 +29,7 @@
 
 // Variáveis globais
 unsigned long tempo_anterior = 0;
-const unsigned long intervalo = 5000;
+const unsigned long intervalo = 1000;
 
 // Prototipo das funcoes
 
@@ -41,6 +42,7 @@ void setup()
   inicializa_saidas();
   inicializa_mqtt();
   inicializa_servos();
+  randomSeed(analogRead(0));
 }
 
 void loop()
@@ -83,4 +85,24 @@ void loop()
     publica_mqtt(mqtt_pub_topic1, json);
     mensagemEmFila = false;
   }
+}
+
+int senha;
+const unsigned long intervaloNormal = 30000;
+
+unsigned long tempoInicialResetSenha = 0;
+unsigned long intervaloResetSenha = 0;
+
+int randomiza_senha()
+{
+  unsigned long tempoAtual = millis();
+
+  if (tempoAtual - tempoInicialResetSenha >= intervaloResetSenha)
+  {
+    if(intervaloResetSenha != intervaloNormal) intervaloResetSenha = intervaloNormal;
+    tempoInicialResetSenha = tempoAtual;
+    senha = random(1000, 9999);
+    Serial.printf("Nova Senha: %d\n", senha);
+  }
+  return senha;
 }
