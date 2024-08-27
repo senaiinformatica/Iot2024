@@ -129,6 +129,7 @@ void tratar_msg(char *topic, String msg)
     {
       if (doc["token"] == senha)
       {
+        tempoSenhaEstendido();
         if (doc.containsKey("LedState"))
         {
           LedBuiltInState = doc["LedState"];

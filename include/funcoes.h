@@ -2,5 +2,6 @@
 #define  _FUNCOES_H_
 
 int randomiza_senha();
+void tempoSenhaEstendido();
 
 #endif
