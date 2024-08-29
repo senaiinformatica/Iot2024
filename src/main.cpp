@@ -1,17 +1,18 @@
-/*************************
- * Projeto IOT com ESP32
- * Escola SENAI de Informática
- * Curso de Apredizagem industrial
- * Integrador de soluções em nuvem
+/*************************************************************
+ * Projeto: Automação IoT com ESP32
+ * Escola: SENAI de Informática
+ * Curso: Aprendizagem Industrial - Integrador de Soluções em Nuvem
  * Data: 01/08/2024
  *
  * Autor: Thiago Augusto de Oliveira
+ * Versão: 0.9
  *
- * Descrição: Projeto de automação utilizando ESP32
- * com conexão WiFi e MQTT.
- *
- * versão: 0.9
- *************************/
+ * Descrição:
+ * Este projeto utiliza o ESP32 para implementar uma solução
+ * de automação com conectividade WiFi e integração via MQTT.
+ * O código controla entradas e saídas digitais, monitorando
+ * estados e publicando informações para um broker MQTT.
+ *************************************************************/
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -25,11 +26,10 @@
 // Definição dos tópicos de publicação
 #define mqtt_pub_topic1 "projetoProfessor/desafio1"
 
-// Criacao de objetos
 
 // Variáveis globais
-unsigned long tempo_anterior = 0;
-const unsigned long intervalo = 1000;
+unsigned long tempoAnteriorIntervaloPublicacao = 0;
+const unsigned long intervaloPublicao = 1000;
 
 // Prototipo das funcoes
 
@@ -42,7 +42,7 @@ void setup()
   inicializa_saidas();
   inicializa_mqtt();
   inicializa_servos();
-  randomSeed(analogRead(0));
+  randomSeed(esp_random());
 }
 
 void loop()
@@ -51,16 +51,17 @@ void loop()
   atualiza_saidas();
   atualiza_botoes();
   atualiza_mqtt();
+  randomiza_senha();
 
   JsonDocument doc;
   String json;
-  bool mensagemEmFila = false;
+  bool mensagemPendente = false;
 
-  if (millis() - tempo_anterior >= intervalo)
+  if (millis() - tempoAnteriorIntervaloPublicacao >= intervaloPublicao)
   {
-    tempo_anterior = millis();
+    tempoAnteriorIntervaloPublicacao = millis();
     doc["timeStamp"] = timeStamp();
-    mensagemEmFila = true;
+    mensagemPendente = true;
   }
 
   if (botao_boot_pressionado())
@@ -69,24 +70,25 @@ void loop()
     doc["LedState"] = LedBuiltInState;
     doc["BotaoState"] = true;
     doc["timeStamp"] = timeStamp();
-    mensagemEmFila = true;
+    mensagemPendente = true;
   }
 
   else if (botao_boot_solto())
   {
     doc["BotaoState"] = false;
     doc["timeStamp"] = timeStamp();
-    mensagemEmFila = true;
+    mensagemPendente = true;
   }
 
-  if (mensagemEmFila)
+  if (mensagemPendente)
   {
     serializeJson(doc, json);
     publica_mqtt(mqtt_pub_topic1, json);
-    mensagemEmFila = false;
+    mensagemPendente = false;
   }
 }
 
+// Variáveis e funções relacionadas à senha
 int senha;
 const unsigned long intervaloNormal = 30000;
 const unsigned long intervaloEstendido = 90000;

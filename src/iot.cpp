@@ -9,17 +9,22 @@
 #include "atuadores.h"
 #include "funcoes.h"
 
-// Definição dos tópicos de inscrição
-#define mqtt_topic1 "projetoProfessor/desafio1"
+#define USUARIO_PADRAO "!@#$%^&*()xyz"
+
+// Definição dos tópicos MQTT
+#define mqtt_topic1 "projetoProfessor/"
 #define mqtt_topic2 ""
 #define mqtt_topic3 ""
 
-// Definição do ID do cliente MQTT randomico
-const String cliente_id = "ESP32Client" + String(random(0xffff), HEX);
+// ID do cliente MQTT (gerado randomicamente)
+const String cliente_id = "ESP32Client_" + String(random(0xffff), HEX);
 
-// Definição dos dados de conexão
+// Instâncias para conexão WiFi e MQTT
 WiFiClient espClient;
 PubSubClient client(espClient);
+
+// Variáveis globais
+String usuarioAutorizado = USUARIO_PADRAO;
 
 // Protótipos das funções
 void tratar_msg(char *topic, String msg);
@@ -27,7 +32,9 @@ void callback(char *topic, byte *payload, unsigned int length);
 void reconecta_mqtt();
 void inscricao_topicos();
 
-// Inicia a conexão WiFi
+/**
+ * @brief Estabelece a conexão WiFi.
+ */
 void setup_wifi()
 {
   Serial.println();
@@ -44,14 +51,18 @@ void setup_wifi()
   Serial.println(WiFi.localIP());
 }
 
-// Inicia a conexão MQTT
+/**
+ * @brief Configura a conexão MQTT.
+ */
 void inicializa_mqtt()
 {
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 }
 
-// Atualiza a conexão MQTT
+/**
+ * @brief Atualiza a conexão MQTT e reconecta se necessário.
+ */
 void atualiza_mqtt()
 {
   client.loop();
@@ -61,7 +72,13 @@ void atualiza_mqtt()
   }
 }
 
-// Função de callback chamada quando uma mensagem é recebida
+/**
+ * @brief Callback chamada ao receber mensagem em um tópico inscrito.
+ * 
+ * @param topic Tópico onde a mensagem foi recebida.
+ * @param payload Conteúdo da mensagem recebida.
+ * @param length Tamanho do payload.
+ */
 void callback(char *topic, byte *payload, unsigned int length)
 {
   String msg = "";
@@ -70,13 +87,14 @@ void callback(char *topic, byte *payload, unsigned int length)
     msg += (char)payload[i];
   }
 
-  // Serial.printf("Mensagem recebida em [ %s ] \n\r", topic);
-  // Serial.println(msg);
-
+   //Serial.printf("Mensagem recebida em [ %s ]: \n\r", topic);
+    //Serial.println(msg);
   tratar_msg(topic, msg);
 }
 
-// Função de reconexão ao Broker MQTT
+/**
+ * @brief Tenta reconectar ao Broker MQTT até que a conexão seja estabelecida.
+ */
 void reconecta_mqtt()
 {
   while (!client.connected())
@@ -97,7 +115,12 @@ void reconecta_mqtt()
   }
 }
 
-// Publica uma mensagem no tópico MQTT
+/**
+ * @brief Publica uma mensagem em um tópico MQTT.
+ * 
+ * @param topico Tópico onde a mensagem será publicada.
+ * @param msg Mensagem a ser publicada.
+ */
 void publica_mqtt(String topico, String msg)
 {
   client.publish(topico.c_str(), msg.c_str());
@@ -107,53 +130,77 @@ void publica_mqtt(String topico, String msg)
 // TODO Alterar a programação apartir daqui
 //!----------------------------------------
 
-// Inscreve nos tópicos MQTT
+/**
+ * @brief Inscreve nos tópicos MQTT definidos.
+ */
 void inscricao_topicos()
 {
   client.subscribe(mqtt_topic1); // LED 1
-  // client.subscribe(mqtt_topic2); //LED 2
-  // client.subscribe(mqtt_topic3); //Servo
+  //client.subscribe(mqtt_topic2); 
+  //client.subscribe(mqtt_topic3); 
 }
 
-String usuarioAutorizado = "!@#$%^&*()";
-
-// Trata as mensagens recebidas
+/**
+ * @brief Processa as mensagens recebidas dos tópicos MQTT.
+ * 
+ * @param topic Tópico onde a mensagem foi recebida.
+ * @param msg Conteúdo da mensagem recebida.
+ */
 void tratar_msg(char *topic, String msg)
 {
+
+  // TODO TRATAR MENSSAGENS RECEBIDAS DO TOPICO1 (USUARIO COM VALIDAÇÃO DE TOKEN)
   if (strcmp(topic, mqtt_topic1) == 0)
   {
     int senha = randomiza_senha();
 
     JsonDocument doc;
     deserializeJson(doc, msg);
-    if (doc.containsKey("token"))
+    if (doc.containsKey("token")) //tem o campo token?
     {
-      if (doc["token"] == senha)
+      if (doc["token"] == senha) //o token é igual ao gerado?
       {
-        if (doc.containsKey("user"))
+        if (doc.containsKey("user")) //tem o campo user?
         {
-          String user = doc["user"].as<String>();
+          String user = doc["user"]; //pega o valor do campo user
 
-          if (usuarioAutorizado == "!@#$%^&*()") // verificado se é a primeira conexão
-            usuarioAutorizado = user;
+          if (usuarioAutorizado == USUARIO_PADRAO) // se o usuario autorizado for o padrao
+            usuarioAutorizado = user; //atualiza o usuario autorizado
 
-          if (usuarioAutorizado == user)
+          if (usuarioAutorizado == user) //se o usuario autorizado for igual ao usuario que enviou a mensagem
           {
-            tempoSenhaEstendido();
+            tempoSenhaEstendido(); //estende o tempo da senha, ao espirar o usuario autorizado volta a ser o padrao
 
-            //! ********USUARIO AUTORIZADO APARTIR DAQUI********** */
+            //! ******** USUARIO AUTORIZADO APARTIR DAQUI ***********/
             if (doc.containsKey("LedState"))
             {
               LedBuiltInState = doc["LedState"];
             }
+
+            //! ******** USUARIO AUTORIZADO ATÉ AQUI ***********/
           }
         }
       }
     }
   }
+
+  // TODO TRATAR MENSSAGENS RECEBIDAS DO TOPICO2
+  else if (strcmp(topic, mqtt_topic2) == 0)
+  {
+
+  }
+
+  // TODO TRATAR MENSSAGENS RECEBIDAS DO TOPICO3
+  else if (strcmp(topic, mqtt_topic3) == 0)
+  {
+
+  }
 }
 
+/**
+ * @brief Reseta o usuário autorizado para o padrão.
+ */
 void resetaUsuario()
 {
-  usuarioAutorizado = "!@#$%^&*()";
+  usuarioAutorizado = USUARIO_PADRAO;
 }
