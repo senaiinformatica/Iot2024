@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include <TimeLib.h>
 #include "iot.h"
@@ -19,9 +20,7 @@
 // ID do cliente MQTT (gerado randomicamente)
 const String cliente_id = "ESP32Client_" + String(random(0xffff), HEX);
 
-// Instâncias para conexão WiFi e MQTT
-WiFiClient espClient;
-PubSubClient client(espClient);
+
 
 // Variáveis globais
 String usuarioAutorizado = USUARIO_PADRAO;
@@ -31,6 +30,10 @@ void tratar_msg(char *topic, String msg);
 void callback(char *topic, byte *payload, unsigned int length);
 void reconecta_mqtt();
 void inscricao_topicos();
+
+// Instâncias para conexão WiFi e MQTT
+WiFiClientSecure espClient;
+PubSubClient client(AWS_IOT_ENDPOINT, mqtt_port, callback, espClient);
 
 /**
  * @brief Estabelece a conexão WiFi.
@@ -49,16 +52,13 @@ void setup_wifi()
   Serial.println();
   Serial.print("Conectado ao WiFi com sucesso com IP: ");
   Serial.println(WiFi.localIP());
+
+  espClient.setCACert(AWS_CERT_CA);
+  espClient.setCertificate(AWS_CERT_CRT);
+  espClient.setPrivateKey(AWS_CERT_PRIVATE);
 }
 
-/**
- * @brief Configura a conexão MQTT.
- */
-void inicializa_mqtt()
-{
-  client.setServer(mqtt_server, mqtt_port);
-  client.setCallback(callback);
-}
+
 
 /**
  * @brief Atualiza a conexão MQTT e reconecta se necessário.
@@ -100,15 +100,15 @@ void reconecta_mqtt()
   while (!client.connected())
   {
     Serial.print("Tentando se conectar ao Broker MQTT: ");
-    Serial.println(mqtt_server);
-    if (client.connect(cliente_id.c_str()))
+    Serial.println(AWS_IOT_ENDPOINT);
+    if (client.connect(THINGNAME))
     {
       Serial.println("Conectado ao Broker MQTT");
       inscricao_topicos();
     }
     else
     {
-      Serial.println("Falha ao conectar ao Broker.");
+      Serial.println("Falha ao conectar ao Broker."); 
       Serial.println("Havera nova tentativa de conexao em 2 segundos");
       delay(2000);
     }

@@ -40,7 +40,6 @@ void setup()
   setup_time();
   inicializa_entradas();
   inicializa_saidas();
-  inicializa_mqtt();
   inicializa_servos();
   randomSeed(esp_random());
 }
