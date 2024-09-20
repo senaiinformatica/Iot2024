@@ -22,9 +22,15 @@
 #include "tempo.h"
 #include "atuadores.h"
 #include "funcoes.h"
+#include "displayLCD.h"
+
 
 // Definição dos tópicos de publicação
-#define mqtt_pub_topic1 "projetoProfessor/desafio1"
+const char mqtt_pub_topic1[] = "projeto/dados";
+
+
+
+
 
 
 // Variáveis globais
@@ -32,12 +38,15 @@ unsigned long tempoAnteriorIntervaloPublicacao = 0;
 const unsigned long intervaloPublicao = 1000;
 
 // Prototipo das funcoes
+void printaSenha();
 
 void setup()
 {
   Serial.begin(115200);
+
   setup_wifi();
   setup_time();
+  inicializaLCD();
   inicializa_entradas();
   inicializa_saidas();
   inicializa_servos();
@@ -85,6 +94,7 @@ void loop()
     publica_mqtt(mqtt_pub_topic1, json);
     mensagemPendente = false;
   }
+  
 }
 
 // Variáveis e funções relacionadas à senha
@@ -93,30 +103,44 @@ const unsigned long intervaloNormal = 30000;
 const unsigned long intervaloEstendido = 90000;
 unsigned long tempoInicialResetSenha = 0;
 unsigned long intervaloResetSenha = 0;
+const int divisor = intervaloNormal/80; //Divisor para reduzir a taxa de atualização do display
 
 int randomiza_senha()
 {
   unsigned long tempoAtual = millis();
+  unsigned long tempoDecorrido = tempoAtual - tempoInicialResetSenha;
+  unsigned long tempoRestante = intervaloResetSenha/divisor - tempoDecorrido/divisor;
+  static unsigned long tempoDecorridoAnterior = 0;
 
-  if (tempoAtual - tempoInicialResetSenha >= intervaloResetSenha)
+  if (tempoDecorrido != tempoDecorridoAnterior)
+  {
+    int tempo = map(tempoRestante, 0, intervaloResetSenha/divisor, 0, 80); 
+    printaTempo(0, 1, tempo);
+    tempoDecorridoAnterior = tempoDecorrido;
+  }
+  
+  
+  if (tempoDecorrido >= intervaloResetSenha)
   {
     resetaUsuario();
     if (intervaloResetSenha != intervaloNormal)
       intervaloResetSenha = intervaloNormal;
     tempoInicialResetSenha = tempoAtual;
     senha = random(1000, 9999);
-    Serial.printf("Nova Senha: %d\n", senha);
+    printaSenha(0, 0, senha);
   }
   return senha;
 }
 
-void tempoSenhaEstendido()
+void tempoSenhaEstendido(String user)
 {
   if (intervaloResetSenha != intervaloEstendido)
   {
     unsigned long tempoAtual = millis();
     tempoInicialResetSenha = tempoAtual;
     intervaloResetSenha = intervaloEstendido;
-    Serial.println("Senha estendida por 90 segundos");
+    printaSaudacao(user);
+    Serial.println(F("Senha estendida por 90 segundos"));
   }
 }
+

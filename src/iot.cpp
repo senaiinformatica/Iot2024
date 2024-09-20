@@ -13,9 +13,9 @@
 #define USUARIO_PADRAO "!@#$%^&*()xyz"
 
 // Definição dos tópicos MQTT
-#define mqtt_topic1 "projetoProfessor/"
-#define mqtt_topic2 ""
-#define mqtt_topic3 ""
+const char mqtt_topic1[] = "projeto/site";
+const char mqtt_topic2[] = "projeto/nodered";
+const char mqtt_topic3[] = "projeto/appinventor";
 
 // ID do cliente MQTT (gerado randomicamente)
 const String cliente_id = "ESP32Client_" + String(random(0xffff), HEX);
@@ -41,7 +41,7 @@ PubSubClient client(AWS_IOT_ENDPOINT, mqtt_port, callback, espClient);
 void setup_wifi()
 {
   Serial.println();
-  Serial.print("Conectando-se a Rede WiFi ");
+  Serial.print(F("Conectando-se a Rede WiFi "));
   Serial.print(ssid);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
@@ -50,7 +50,7 @@ void setup_wifi()
     Serial.print(".");
   }
   Serial.println();
-  Serial.print("Conectado ao WiFi com sucesso com IP: ");
+  Serial.print(F("Conectado ao WiFi com sucesso com IP: "));
   Serial.println(WiFi.localIP());
 
   espClient.setCACert(AWS_CERT_CA);
@@ -97,19 +97,20 @@ void callback(char *topic, byte *payload, unsigned int length)
  */
 void reconecta_mqtt()
 {
+  //client.setBufferSize(2048);
   while (!client.connected())
   {
-    Serial.print("Tentando se conectar ao Broker MQTT: ");
+    Serial.print(F("Tentando se conectar ao Broker MQTT: "));
     Serial.println(AWS_IOT_ENDPOINT);
     if (client.connect(THINGNAME))
     {
-      Serial.println("Conectado ao Broker MQTT");
+      Serial.println(F("Conectado ao Broker MQTT"));
       inscricao_topicos();
     }
     else
     {
-      Serial.println("Falha ao conectar ao Broker."); 
-      Serial.println("Havera nova tentativa de conexao em 2 segundos");
+      Serial.println(F("Falha ao conectar ao Broker.")); 
+      Serial.println(F("Havera nova tentativa de conexao em 2 segundos"));
       delay(2000);
     }
   }
@@ -136,8 +137,8 @@ void publica_mqtt(String topico, String msg)
 void inscricao_topicos()
 {
   client.subscribe(mqtt_topic1); // LED 1
-  //client.subscribe(mqtt_topic2); 
-  //client.subscribe(mqtt_topic3); 
+  client.subscribe(mqtt_topic2); 
+  client.subscribe(mqtt_topic3); 
 }
 
 /**
@@ -169,12 +170,13 @@ void tratar_msg(char *topic, String msg)
 
           if (usuarioAutorizado == user) //se o usuario autorizado for igual ao usuario que enviou a mensagem
           {
-            tempoSenhaEstendido(); //estende o tempo da senha, ao espirar o usuario autorizado volta a ser o padrao
+            tempoSenhaEstendido(user); //estende o tempo da senha, ao espirar o usuario autorizado volta a ser o padrao
 
             //! ******** USUARIO AUTORIZADO APARTIR DAQUI ***********/
             if (doc.containsKey("LedState"))
             {
               LedBuiltInState = doc["LedState"];
+              Serial.printf("LedState: %d\n", LedBuiltInState);	
             }
 
             //! ******** USUARIO AUTORIZADO ATÉ AQUI ***********/
@@ -184,13 +186,13 @@ void tratar_msg(char *topic, String msg)
     }
   }
 
-  // TODO TRATAR MENSSAGENS RECEBIDAS DO TOPICO2
+  // TODO TRATAR MENSSAGENS RECEBIDAS DO TOPICO2 DO NODE-RED
   else if (strcmp(topic, mqtt_topic2) == 0)
   {
 
   }
 
-  // TODO TRATAR MENSSAGENS RECEBIDAS DO TOPICO3
+  // TODO TRATAR MENSSAGENS RECEBIDAS DO TOPICO3 DO APP INVENTOR
   else if (strcmp(topic, mqtt_topic3) == 0)
   {
 

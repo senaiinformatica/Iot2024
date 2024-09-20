@@ -2,7 +2,7 @@
 #define  _FUNCOES_H_
 
 int randomiza_senha();
-void tempoSenhaEstendido();
+void tempoSenhaEstendido(String user);
 void resetaUsuario();
 
 #endif
